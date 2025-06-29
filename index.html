@@ -117,45 +117,47 @@
             }
 
             try {
-                // --- CORRECCIÓN FINAL DE DECODIFICACIÓN ---
-                // Se decodifica directamente de Base64 con atob(), ya que el Python
-                // ahora solo usa esa codificación. Se elimina decodeURIComponent().
+                // Se decodifica directamente de Base64
                 const decodedData = atob(dataParam);
                 const data = JSON.parse(decodedData);
 
-                document.getElementById('fecha').textContent = data.fecha || '--/--/----';
-                document.getElementById('mesero').textContent = data.empleado || 'No disponible';
-                document.getElementById('mesa').textContent = data.mesa || '--';
+                // --- JAVASCRIPT ACTUALIZADO PARA LEER CLAVES CORTAS ---
+                document.getElementById('fecha').textContent = data.f || '--/--/----';
+                document.getElementById('mesero').textContent = data.e || 'No disponible';
+                document.getElementById('mesa').textContent = data.m || '--';
 
                 // Montos en Bolívares
-                document.getElementById('subtotal_bs').textContent = formatVE(data.subtotal_bs);
-                document.getElementById('servicio_bs').textContent = formatVE(data.servicio_bs);
-                document.getElementById('iva_bs').textContent = formatVE(data.iva_bs);
-                document.getElementById('total_bs').textContent = formatVE(data.total_bs);
+                document.getElementById('subtotal_bs').textContent = formatVE(data.s_bs);
+                document.getElementById('servicio_bs').textContent = formatVE(data.se_bs);
+                document.getElementById('iva_bs').textContent = formatVE(data.i_bs);
+                document.getElementById('total_bs').textContent = formatVE(data.t_bs);
 
                 // Montos en Divisas
-                document.getElementById('tasa_cambio').textContent = formatVE(data.tasa_cambio);
-                document.getElementById('subtotal_usd').textContent = formatUSD(data.subtotal_usd);
-                document.getElementById('servicio_usd').textContent = formatUSD(data.servicio_usd);
-                document.getElementById('iva_usd').textContent = formatUSD(data.iva_usd);
-                document.getElementById('igtf_usd').textContent = formatUSD(data.igtf_usd);
-                document.getElementById('total_usd').textContent = formatUSD(data.total_usd);
+                document.getElementById('tasa_cambio').textContent = formatVE(data.tc);
+                document.getElementById('subtotal_usd').textContent = formatUSD(data.s_usd);
+                document.getElementById('servicio_usd').textContent = formatUSD(data.se_usd);
+                document.getElementById('iva_usd').textContent = formatUSD(data.i_usd);
+                document.getElementById('igtf_usd').textContent = formatUSD(data.ig_usd);
+                document.getElementById('total_usd').textContent = formatUSD(data.t_usd);
 
                 const itemsContainer = document.getElementById('items-container');
                 itemsContainer.innerHTML = '';
 
-                if (data.items && data.items.length > 0) {
-                    data.items.forEach(item => {
+                // Usamos la clave corta "i" para los items
+                if (data.i && data.i.length > 0) {
+                    data.i.forEach(item => {
                         const itemDiv = document.createElement('div');
                         itemDiv.className = 'flex justify-between items-center text-sm';
 
                         const nameQtySpan = document.createElement('span');
                         nameQtySpan.className = 'text-gray-800';
-                        nameQtySpan.textContent = `${item.qty}x ${item.desc}`;
+                        // Usamos las claves cortas "q" y "d"
+                        nameQtySpan.textContent = `${item.q}x ${item.d}`;
 
                         const priceSpan = document.createElement('span');
                         priceSpan.className = 'font-medium text-gray-700';
-                        priceSpan.textContent = `Bs. ${formatVE(item.price)}`;
+                        // Usamos la clave corta "p"
+                        priceSpan.textContent = `Bs. ${formatVE(item.p)}`;
 
                         itemDiv.appendChild(nameQtySpan);
                         itemDiv.appendChild(priceSpan);
