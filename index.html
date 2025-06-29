@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalle de Precuenta</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+    <div class="w-full max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6 sm:p-8">
+        <header class="text-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Bonsai Bar Restaurant</h1>
+            <p class="text-gray-500">Detalle de su Precuenta</p>
+        </header>
+
+        <div class="border-t border-b border-gray-200 py-4 mb-6">
+            <div class="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Fecha:</span>
+                <span id="fecha" class="font-medium text-gray-900">--/--/----</span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600">
+                <span>Atendido por:</span>
+                <span id="mesero" class="font-medium text-gray-900">No disponible</span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600 mt-2">
+                <span>Mesa/Orden:</span>
+                <span id="mesa" class="font-medium text-gray-900">--</span>
+            </div>
+        </div>
+
+        <div id="items-container" class="space-y-3 mb-6">
+            <!-- Los items se insertarán aquí dinámicamente -->
+        </div>
+
+        <!-- Montos en Bolívares -->
+        <div class="border-t border-gray-200 pt-4 space-y-2">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Total en Bolívares (Bs.)</h2>
+            <div class="flex justify-between text-sm text-gray-600">
+                <span>Sub-Total:</span>
+                <span id="subtotal_bs" class="font-medium text-gray-900">0,00</span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600">
+                <span>Servicio (10%):</span>
+                <span id="servicio_bs" class="font-medium text-gray-900">0,00</span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600">
+                <span>IVA (16%):</span>
+                <span id="iva_bs" class="font-medium text-gray-900">0,00</span>
+            </div>
+            <div class="flex justify-between text-xl font-bold text-gray-900 mt-2">
+                <span>TOTAL (Bs.):</span>
+                <span id="total_bs">0,00</span>
+            </div>
+        </div>
+
+        <!-- Montos en Divisas -->
+        <div class="border-t border-gray-200 pt-4 mt-6 space-y-2">
+            <h2 class="text-lg font-semibold text-gray-700 mb-2">Estimado en Divisas (USD)</h2>
+            <div class="flex justify-between text-xs text-gray-500 mb-2">
+                <span>Tasa de Cambio:</span>
+                <span id="tasa_cambio" class="font-medium">1,00</span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600">
+                <span>Sub-Total:</span>
+                <span id="subtotal_usd" class="font-medium text-gray-900">0.00</span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600">
+                <span>Servicio (10%):</span>
+                <span id="servicio_usd" class="font-medium text-gray-900">0.00</span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600">
+                <span>IVA (16%):</span>
+                <span id="iva_usd" class="font-medium text-gray-900">0.00</span>
+            </div>
+            <div class="flex justify-between text-sm text-gray-600 text-red-600">
+                <span>IGTF (3%):</span>
+                <span id="igtf_usd" class="font-medium">0.00</span>
+            </div>
+            <div class="flex justify-between text-xl font-bold text-gray-900 mt-2">
+                <span>TOTAL (USD):</span>
+                <span id="total_usd">0.00</span>
+            </div>
+        </div>
+
+        <footer class="text-center mt-8">
+            <p class="text-xs text-gray-400">Gracias por su visita. Este documento no es una factura fiscal.</p>
+        </footer>
+    </div>
+
+    <script>
+        function formatVE(amount) {
+            const num = parseFloat(amount) || 0;
+            return new Intl.NumberFormat('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
+        }
+        function formatUSD(amount) {
+            const num = parseFloat(amount) || 0;
+            return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(num);
+        }
+
+        function populateData() {
+            const params = new URLSearchParams(window.location.search);
+            const dataParam = params.get('data');
+
+            if (!dataParam) { console.error('No se encontraron datos en la URL.'); return; }
+
+            try {
+                const decodedData = decodeURIComponent(atob(dataParam));
+                const data = JSON.parse(decodedData);
+
+                document.getElementById('fecha').textContent = data.fecha || '--/--/----';
+                document.getElementById('mesero').textContent = data.empleado || 'No disponible';
+                document.getElementById('mesa').textContent = data.mesa || '--';
+
+                // Montos en Bolívares
+                document.getElementById('subtotal_bs').textContent = formatVE(data.subtotal_bs);
+                document.getElementById('servicio_bs').textContent = formatVE(data.servicio_bs);
+                document.getElementById('iva_bs').textContent = formatVE(data.iva_bs);
+                document.getElementById('total_bs').textContent = formatVE(data.total_bs);
+
+                // Montos en Divisas
+                document.getElementById('tasa_cambio').textContent = formatVE(data.tasa_cambio);
+                document.getElementById('subtotal_usd').textContent = formatUSD(data.subtotal_usd);
+                document.getElementById('servicio_usd').textContent = formatUSD(data.servicio_usd);
+                document.getElementById('iva_usd').textContent = formatUSD(data.iva_usd);
+                document.getElementById('igtf_usd').textContent = formatUSD(data.igtf_usd);
+                document.getElementById('total_usd').textContent = formatUSD(data.total_usd);
+
+                const itemsContainer = document.getElementById('items-container');
+                itemsContainer.innerHTML = '';
+
+                if (data.items && data.items.length > 0) {
+                    data.items.forEach(item => {
+                        const itemDiv = document.createElement('div');
+                        itemDiv.className = 'flex justify-between items-center text-sm';
+
+                        const nameQtySpan = document.createElement('span');
+                        nameQtySpan.className = 'text-gray-800';
+                        nameQtySpan.textContent = `${item.qty}x ${item.desc}`;
+
+                        const priceSpan = document.createElement('span');
+                        priceSpan.className = 'font-medium text-gray-700';
+                        priceSpan.textContent = `Bs. ${formatVE(item.price)}`;
+
+                        itemDiv.appendChild(nameQtySpan);
+                        itemDiv.appendChild(priceSpan);
+                        itemsContainer.appendChild(itemDiv);
+                    });
+                }
+
+            } catch (error) {
+                console.error('Error al parsear los datos del QR:', error);
+                document.body.innerHTML = '<div class="text-red-500 font-bold text-center">Error al leer los datos de la precuenta.</div>';
+            }
+        }
+
+        window.onload = populateData;
+    </script>
+</body>
+
+</html>
